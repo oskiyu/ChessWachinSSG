@@ -45,10 +45,11 @@ namespace ChessWachinSSG {
 				CountryDao.FromFile("Data/countries.json", new FileReader()),
 				PlayerDao.FromFile("Data/players.json", new FileReader()),
 				TagDao.FromFile("Data/tags.json", new FileReader()),
-				CompetitionDao.FromFile("Data/competitions.json", new FileReader()));
+				CompetitionDao.FromFile("Data/competitions.json", new FileReader()),
+				NewsDao.FromFile("Data/news.json", new FileReader()));
 
 			// Actualización de ELO (opcional).
-			if (args.Contains("-eloupdate")) {
+			if (args.Contains("-eloupdate") && false) {
 				List<Task<EloDto>> elos = [];
 				List<EloDto> elosDatas = [];
 
@@ -61,7 +62,7 @@ namespace ChessWachinSSG {
 					elosDatas.Add(elo.Result);
 				}
 
-				var dao = new EloDao((elosDatas, $"{DateTime.Now:yyyy-MM-dd h:mm:ss}"));
+				var dao = new EloDao((elosDatas, $"{DateTime.Now:yyyy-MM-dd hh:mm:ss}"));
 				dao.Save("Data/elo_cache.json");
 
 				contextBuilder.SetElos(dao.GetAllElos(), dao.GetDate());
@@ -163,4 +164,5 @@ namespace ChessWachinSSG {
 		private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
 
 	}
+
 }

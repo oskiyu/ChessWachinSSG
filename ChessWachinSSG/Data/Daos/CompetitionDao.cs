@@ -1,5 +1,8 @@
 ﻿using System.Text.Json;
 using ChessWachinSSG.Data.Dtos;
+using ChessWachinSSG.Model;
+
+using NLog;
 
 namespace ChessWachinSSG.Data.Daos {
 
@@ -55,9 +58,10 @@ namespace ChessWachinSSG.Data.Daos {
 
                 foreach (var jsonElement in root.EnumerateArray()) {
                     string? id = DaoMethods.GetJsonString("id", jsonElement, logger);
-                    string? name = DaoMethods.GetJsonString("name", jsonElement, logger);
+					string? name = DaoMethods.GetJsonString("name", jsonElement, logger);
+					string? type = DaoMethods.GetJsonString("type", jsonElement, logger);
 
-                    if (id == null || name == null) {
+					if (id == null || name == null || type == null) {
                         logger.Error("Entrada con parámetros incorrectos.");
                         continue;
                     }
@@ -75,7 +79,14 @@ namespace ChessWachinSSG.Data.Daos {
                         logger.Warn($"No se encuentra la fase de playoffs para la competición {id}.");
                     }
 
-                    output[id] = new CompetitionDto(id, name, leagueData, playoffsData, GetInitialElos(jsonElement.GetProperty("initial_elos")));
+                    CompetitionType ctype = type switch {
+                        "blitz" => CompetitionType.Blitz,
+                        "rapid" => CompetitionType.Rapid,
+                        "freestyle" => CompetitionType.FreeStyle,
+                        _ => CompetitionType.Rapid
+                    };
+
+                    output[id] = new CompetitionDto(id, name, leagueData, playoffsData, GetInitialElos(jsonElement.GetProperty("initial_elos")), ctype);
                 }
 
                 logger.Trace($"Cargadas {output.Count} competiciones.");

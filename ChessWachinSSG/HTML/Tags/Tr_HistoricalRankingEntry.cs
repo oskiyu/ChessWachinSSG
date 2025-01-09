@@ -32,11 +32,11 @@ namespace ChessWachinSSG.HTML.Tags {
 				var golds = 0;
 				var silvers = 0;
 				var bronzes = 0;
-				foreach (var (key, competition) in context.Competitions) {
+				foreach (var (_, competition) in context.Competitions) {
 					if (competition.LeaguePhase != null) {
-						golds += competition.LeaguePhase.Winner == playerScore.Player ? 1 : 0;
-						silvers += competition.LeaguePhase.Second == playerScore.Player ? 1 : 0;
-						bronzes += competition.LeaguePhase.Third == playerScore.Player ? 1 : 0;
+						golds += competition.LeaguePhase.IsPlayerFirst(playerScore.Player) ? 1 : 0;
+						silvers += competition.LeaguePhase.IsPlayerSecond(playerScore.Player) ? 1 : 0;
+						bronzes += competition.LeaguePhase.IsPlayerThird(playerScore.Player) ? 1 : 0;
 					}
 
 					if (competition.Playoffs != null) {

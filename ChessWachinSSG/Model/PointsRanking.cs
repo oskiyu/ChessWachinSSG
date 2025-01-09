@@ -49,6 +49,22 @@ namespace ChessWachinSSG.Model {
 			}
 
 			/// <summary>
+			/// Se asegura de que aparezcan todos los jugadores, aunque no 
+			/// hayan participado todavía.
+			/// </summary>
+			/// <param name="players">Lista con todos los jugadores.</param>
+			/// <returns>Self.</returns>
+			public Builder WithPlayers(List<Player> players) {
+				foreach (Player player in players) {
+					if (!instance.scores.ContainsKey(player.Id)) {
+						instance.scores[player.Id] = new PlayerScores(player);
+					}
+				}
+
+				return this;
+			}
+
+			/// <summary>
 			/// Procesa todas las partidas indicadas.
 			/// </summary>
 			/// <param name="matchList">Lista de partidas.</param>

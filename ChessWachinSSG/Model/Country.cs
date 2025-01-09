@@ -6,6 +6,7 @@ namespace ChessWachinSSG.Model {
 	/// <param name="Id">ID del país.</param>
 	/// <param name="Name">Nombre del país.</param>
 	/// <param name="FlagIconPath">Ruta al icono de la bandera del país.</param>
-	public record class Country(string Id, string Name, string FlagIconPath);
+	/// <param name="PlayerCardClass">Clase CSS para mostrar la bandera en la tarjeta de perfil.</param>
+	public record class Country(string Id, string Name, string FlagIconPath, string PlayerCardClass);
 
 }

@@ -27,13 +27,13 @@ namespace ChessWachinSSG.Model {
 			/// <summary>
 			/// Construye el contexto a partir de los daos indicados.
 			/// </summary>
-			public Builder ApplyDaos(CountryDao countriesDao, PlayerDao playersDao, TagDao tagDao, CompetitionDao competitionDao) {
+			public Builder ApplyDaos(CountryDao countriesDao, PlayerDao playersDao, TagDao tagDao, CompetitionDao competitionDao, NewsDao newsDao) {
 				logger.Trace($"Cargando contexto.");
 
 				// Carga de países.
 				var countries = countriesDao.GetAllCountries();
 				foreach (var c in countries) {
-					instance._countries[c.Id] = new(c.Id, c.Name, c.FlagIconPath);
+					instance._countries[c.Id] = new(c.Id, c.Name, c.FlagIconPath, c.PlayerCardClass);
 				}
 
 				// Carga de jugadores.
@@ -117,7 +117,7 @@ namespace ChessWachinSSG.Model {
 					var leagueMatches = leagueMatchesBuilder.Build();
 					League? league = leagueMatches.GetAll().Count switch {
 						0 => null,
-						_ => new League(c.League!.Id, leagueMatches, c.League.QPositions)
+						_ => new League(c.League!.Id, leagueMatches, c.League.QPositions, c.Id)
 					};
 
 					var sf1Matches = sf1MatchesBuilder.Build();
@@ -149,7 +149,7 @@ namespace ChessWachinSSG.Model {
 						elos.Add(new(instance.Players[elo.PlayerId], elo.Elo));
 					}
 
-					instance._competitions[c.Id] = new(c.Id, c.Name, league, playoffs, elos);
+					instance._competitions[c.Id] = new(c.Id, c.Name, league, playoffs, elos, c.Type);
 				}
 
 				foreach (var t in tagDao.GetTagsMap()) {
@@ -166,6 +166,8 @@ namespace ChessWachinSSG.Model {
 #pragma warning restore CS8509
 				}
 
+				instance.News = newsDao.GetAllNews();
+
 				// Internal.
 				instance._tagReplacers[Tr_HistoricalRankingEntry.Id] = new Tr_HistoricalRankingEntry(new FileReader());
 				instance._tagReplacers["cwssg:version"] = new Tr_Inline(Assembly.GetExecutingAssembly().GetName().Version!.ToString());
@@ -177,6 +179,9 @@ namespace ChessWachinSSG.Model {
 				instance._tagReplacers["cwssg:playoffs:draw:bo7"] = new Tr_PlayoffsDraw_Bo7(new FileReader());
 				instance._tagReplacers["cwssg:competition:initialelo:elo"] = new Tr_InitialEloTable(new FileReader());
 				instance._tagReplacers["cwssg:elo:rankings"] = new Tr_EloTable(new FileReader());
+				instance._tagReplacers["cwssg:header"] = new Tr_Header(new FileReader());
+				instance._tagReplacers["cwssg:news:entries"] = new Tr_NewsEntries(new FileReader());
+				instance._tagReplacers["cwssg:news:lite:entries"] = new Tr_NewsEntries_Lite(new FileReader());
 
 				logger.Trace($"Carga finalizada.");
 
@@ -248,7 +253,7 @@ namespace ChessWachinSSG.Model {
 		/// <summary>
 		/// Construye el ranking global.
 		/// </summary>
-		private void BuildHistoricalRanking() => _historicalRanking = new PointsRanking.Builder().ApplyAllMatches(AllMatches).Build();
+		private void BuildHistoricalRanking() => _historicalRanking = new PointsRanking.Builder().ApplyAllMatches(AllMatches).WithPlayers([.. _players.Values]).Build();
 
 		/// <summary>
 		/// Construye los records personales de todos los jugadores.
@@ -377,6 +382,8 @@ namespace ChessWachinSSG.Model {
 		public PlayoffsRound? GetPlayoffsRound(string id) 
 			=> Competitions.Values.FirstOrDefault(x => x.Playoffs?.GetPhase(id) != null)?.Playoffs?.GetPhase(id);
 
+
+		public List<NewsDto> News { get; private set; } = new();
 
 		private MatchList _allMatches = new();
 		public MatchList AllMatches { get => _allMatches; }

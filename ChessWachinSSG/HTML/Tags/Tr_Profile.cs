@@ -48,10 +48,12 @@ namespace ChessWachinSSG.HTML.Tags {
 				{ "cwssg:profile:draws", new Tr_Inline($"{globalRanking.GetPlayerInfo(player)?.Draws ?? 0}") },
 				{ "cwssg:profile:losses", new Tr_Inline($"{globalRanking.GetPlayerInfo(player)?.Losses ?? 0}") },
 
-				{ "cwssg:profile:results", new Tr_ProfileResults(reader, player) },
+				{ "cwssg:profile:results", new Tr_ProfileResults2(reader, player) },
 				{ "cwssg:profile:records", new Tr_ProfileRecords(reader, player) },
 				{ "cwssg:profile:history", new Tr_ProfileHistory(reader, player) },
-				{ "cwssg:profile:matchups", new Tr_ProfileMatchupsTable(reader, player) }
+				{ "cwssg:profile:matchups", new Tr_ProfileMatchupsTable(reader, player) },
+
+				{ "cwssg:profile:card", new Tr_PlayerCard(reader, player) }
 			};
 
 			return HtmlBuilder.Process(template, context, replacers);

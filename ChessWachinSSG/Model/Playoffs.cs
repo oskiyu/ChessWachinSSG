@@ -37,6 +37,28 @@
 			return null;
 		}
 
+		/// <param name="player">Jugador a comprobar.</param>
+		/// <returns>
+		/// True si se ha clasificado a la final.
+		/// False en caso contrario.
+		/// </returns>
+		public bool IsPlayerQualified(Player player) {
+			if (Semifinals1?.Matches.GetAt(0)?.First == player) {
+				return true;
+			}
+			else if (Semifinals1?.Matches.GetAt(0)?.Second == player) {
+				return true;
+			}
+			else if (Semifinals2?.Matches.GetAt(0)?.First == player) {
+				return true;
+			}
+			else if (Semifinals2?.Matches.GetAt(0)?.Second == player) {
+				return true;
+			}
+
+			return false;
+		}
+
 	}
 
 }

@@ -3,7 +3,7 @@
 	/// <summary>
 	/// Información sobre una fase de liga.
 	/// </summary>
-	public record class League(string Id, MatchList Matches, int NumQualifications) {
+	public record class League(string Id, MatchList Matches, int NumQualifications, string CompetitionId) {
 
 		/// <summary>
 		/// Ranking de la fase de liga.
@@ -14,17 +14,36 @@
 		/// <summary>
 		/// Ganador de la fase de liga, si está completa.
 		/// </summary>
-		public Player Winner { get => Ranking.Ranking[0].Player; }
+		public Player? Winner { get => Ranking.Ranking.Count > 0 ? Ranking.Ranking[0].Player : null; }
 
 		/// <summary>
 		/// Segundo de la fase de liga, si está completa.
 		/// </summary>
-		public Player Second { get => Ranking.Ranking[1].Player; }
+		public Player? Second { get => Ranking.Ranking.Count > 1 ? Ranking.Ranking[1].Player : null; }
 
 		/// <summary>
 		/// Tercero de la fase de liga, si está completa.
 		/// </summary>
-		public Player Third { get => Ranking.Ranking[2].Player; }
+		public Player? Third { get => Ranking.Ranking.Count > 2 ? Ranking.Ranking[2].Player : null; }
+
+
+		/// <param name="player">Jugador.</param>
+		/// <returns>
+		/// True si el primer clasificado de la liga es el jugador indicado.
+		/// Si player es null, o la competición no contiene al jugador, devuelve false.</returns>
+		public bool IsPlayerFirst(Player? player) => Winner == player;
+
+		/// <param name="player">Jugador.</param>
+		/// <returns>
+		/// True si el segundo clasificado de la liga es el jugador indicado.
+		/// Si player es null, o la competición no contiene al jugador, devuelve false.</returns>
+		public bool IsPlayerSecond(Player? player) => Second == player;
+
+		/// <param name="player">Jugador.</param>
+		/// <returns>
+		/// True si el tercer clasificado de la liga es el jugador indicado.
+		/// Si player es null, o la competición no contiene al jugador, devuelve false.</returns>
+		public bool IsPlayerThird(Player? player) => Third == player;
 
 
 		/// <summary>

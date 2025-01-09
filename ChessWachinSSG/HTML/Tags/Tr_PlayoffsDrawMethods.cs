@@ -58,7 +58,7 @@ namespace ChessWachinSSG.HTML.Tags {
 			var secondPlayer = phase.Matches.GetAll()[0].Second;
 
 			var firstPoints = phase.Ranking.GetPlayerInfo(firstPlayer.Id)?.Points.ToString() ?? string.Empty;
-			var secondPoints = phase.Ranking.GetPlayerInfo(firstPlayer.Id)?.Points.ToString() ?? string.Empty;
+			var secondPoints = phase.Ranking.GetPlayerInfo(secondPlayer.Id)?.Points.ToString() ?? string.Empty;
 
 			return new() {
 				{ $"cwssg:playoffs:{GetPlayoffPhaseTypeStr(type)}:first", new Tr_Inline($"<{firstPlayer.NameTag}>") },

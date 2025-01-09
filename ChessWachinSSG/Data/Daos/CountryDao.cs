@@ -57,14 +57,15 @@ namespace ChessWachinSSG.Data.Daos {
                 foreach (var jsonElement in root.EnumerateArray()) {
                     string? id = DaoMethods.GetJsonString("id", jsonElement, logger);
                     string? name = DaoMethods.GetJsonString("name", jsonElement, logger);
-                    string? flagIconPath = DaoMethods.GetJsonString("flagIcon", jsonElement, logger);
+					string? flagIconPath = DaoMethods.GetJsonString("flagIcon", jsonElement, logger);
+					string? playerCardClass = DaoMethods.GetJsonString("playerCardClass", jsonElement, logger);
 
-                    if (id == null || name == null || flagIconPath == null) {
+					if (id == null || name == null || flagIconPath == null || playerCardClass == null) {
                         logger.Error($"Detectado país con argumentos incompletos.");
                         continue;
                     }
 
-                    output[id] = new CountryDto(id, name, flagIconPath);
+                    output[id] = new CountryDto(id, name, flagIconPath, playerCardClass);
                 }
             }
 

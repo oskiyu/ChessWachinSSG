@@ -13,6 +13,14 @@ namespace ChessWachinSSG {
 		public const string YellowBox = "🟨";
 		public const string RedBox = "🟥";
 
+		public static string GetRankingColorClass(int position)
+			=> position switch {
+				1 => "pfp_ranking_gold",
+				2 => "pfp_ranking_silver",
+				3 => "pfp_ranking_bronze",
+				_ => string.Empty
+			};
+
 		public static string ToMinutesSeconds(int seconds) {
 			return $"{seconds / 60}m {seconds % 60}s";
 		}
@@ -31,6 +39,7 @@ namespace ChessWachinSSG {
 
 			return medal;
 		}
+
 	}
 
 }
