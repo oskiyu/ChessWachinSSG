@@ -5,8 +5,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>1.2.1</AssemblyVersion>
-    <Copyright>(c) oskiyu 2024</Copyright>
+    <AssemblyVersion>1.2.3</AssemblyVersion>
+    <Copyright>(c) oskiyu 2024-2025</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

@@ -16,7 +16,35 @@
 		public int Losses { get; set; } = 0;
 
 		public int CompareTo(PlayerScores? other) {
-			return -(Points - other?.Points ?? 0);
+			if (other == null) {
+				return -1;
+			}
+
+			if (Points > other.Points) {
+				return -1;
+			}
+
+			if (Points < other.Points) {
+				return 1;
+			}
+
+			if (Wins > other.Wins) {
+				return -1;
+			}
+
+			if (Wins < other.Wins) {
+				return 1;
+			}
+
+			if (Losses > other.Losses) {
+				return 1;
+			}
+
+			if (Losses < other.Losses) {
+				return -1;
+			}
+
+			return 0;
 		}
 
 	}
