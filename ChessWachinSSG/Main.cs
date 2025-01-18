@@ -7,6 +7,7 @@ using System.Text.Json;
 using ChessWachinSSG.Data.Dtos;
 using ChessWachinSSG.Data.Daos;
 using System.Reflection;
+using System.Linq.Expressions;
 
 namespace ChessWachinSSG {
 
@@ -49,7 +50,8 @@ namespace ChessWachinSSG {
 				NewsDao.FromFile("Data/news.json", new FileReader()));
 
 			// Actualización de ELO (opcional).
-			if (args.Contains("-eloupdate") && false) {
+			bool updateElo = false;
+			if (args.Contains("-eloupdate") || updateElo) {
 				List<Task<EloDto>> elos = [];
 				List<EloDto> elosDatas = [];
 

@@ -173,6 +173,7 @@ namespace ChessWachinSSG.Model {
 				instance._tagReplacers["cwssg:version"] = new Tr_Inline(Assembly.GetExecutingAssembly().GetName().Version!.ToString());
 				instance._tagReplacers["cwssg:league:history"] = new Tr_MatchHistory(new FileReader());
 				instance._tagReplacers["cwssg:league:ranking"] = new Tr_LeagueRanking(new FileReader());
+				instance._tagReplacers["cwssg:partidasporjugar"] = new Tr_PorJugar(new FileReader());
 				instance._tagReplacers["cwssg:playoffs:phase:history"] = new Tr_PlayoffPhaseHistory(new FileReader());
 				instance._tagReplacers["cwssg:competition:stats"] = new Tr_CompetitionStatsTable(new FileReader());
 				instance._tagReplacers["cwssg:playoffs:draw:bo5"] = new Tr_PlayoffsDraw_Bo5(new FileReader());
