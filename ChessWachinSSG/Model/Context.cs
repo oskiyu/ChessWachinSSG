@@ -138,7 +138,7 @@ namespace ChessWachinSSG.Model {
 						_ => new PlayoffsRound(c.Playoffs!.Finals!.Id, c.Playoffs.Finals.Name, finalsMatches)
 					};
 
-					var playoffs = new Playoffs(c.Playoffs?.Id ?? "", sf1, sf2, finals, c.Playoffs?.DefaultDurations ?? []);
+					var playoffs = new Playoffs(c.Playoffs?.Id ?? "", sf1, sf2, finals, c.Playoffs?.DefaultDurations ?? [], league!);
 
 					sf1?.SetParent(playoffs);
 					sf2?.SetParent(playoffs);
@@ -254,7 +254,15 @@ namespace ChessWachinSSG.Model {
 		/// <summary>
 		/// Construye el ranking global.
 		/// </summary>
-		private void BuildHistoricalRanking() => _historicalRanking = new PointsRanking.Builder().ApplyAllMatches(AllMatches).WithPlayers([.. _players.Values]).Build();
+		private void BuildHistoricalRanking() {
+			var builder = new HistoricalRanking.Builder();
+
+			foreach (var competition in Competitions.Values) {
+				builder.ApplyCompetition(competition);
+			}
+
+			_historicalRanking = builder.WithPlayers([.. _players.Values]).Build();
+		}
 
 		/// <summary>
 		/// Construye los records personales de todos los jugadores.
@@ -389,8 +397,8 @@ namespace ChessWachinSSG.Model {
 		private MatchList _allMatches = new();
 		public MatchList AllMatches { get => _allMatches; }
 
-		private PointsRanking _historicalRanking = new();
-		public PointsRanking HistoricalRanking { get => _historicalRanking; }
+		private HistoricalRanking _historicalRanking = new();
+		public HistoricalRanking HistoricalRanking { get => _historicalRanking; }
 
 		private string _elosDates = string.Empty;
 		public string ElosDate {  get => _elosDates; }

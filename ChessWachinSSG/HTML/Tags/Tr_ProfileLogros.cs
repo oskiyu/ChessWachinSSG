@@ -15,33 +15,24 @@ namespace ChessWachinSSG.HTML.Tags {
 	public class Tr_ProfileLogros(IFileReader reader, Player player, string colorClass) : ITagReplacer {
 
 		public string Replace(Tag tag, Context context) {
-			var cups = 0;
-			var golds = 0;
-			var silvers = 0;
-			var bronzes = 0;
-			foreach (var (key, competition) in context.Competitions) {
-				if (competition.LeaguePhase != null && competition.LeaguePhase.IsFinished) {
-					golds += competition.LeaguePhase.Winner == player ? 1 : 0;
-					silvers += competition.LeaguePhase.Second == player ? 1 : 0;
-					bronzes += competition.LeaguePhase.Third == player ? 1 : 0;
-				}
-
-				if (competition.Playoffs != null) {
-					cups += competition.Playoffs.Winner == player ? 1 : 0;
-					golds += competition.Playoffs.Winner == player ? 1 : 0;
-					silvers += competition.Playoffs.Second == player ? 1 : 0;
-				}
-			}
-
 			StringBuilder output = new();
 
-			output.Append(new Tr_ProfileCardTitles(reader, colorClass, cups).Replace(Tag.Empty, context));
-			output.Append(new Tr_ProfileCardGolds(reader, colorClass, golds).Replace(Tag.Empty, context));
-			output.Append(new Tr_ProfileCardSilvers(reader, colorClass, silvers).Replace(Tag.Empty, context));
-			output.Append(new Tr_ProfileCardBronzes(reader, colorClass, bronzes).Replace(Tag.Empty, context));
+			var playerInfo = context.HistoricalRanking.GetPlayerInfo(player);
+
+			if (playerInfo == null) {
+				logger.Error($"El jugador {player.Id} no se encuentra en el ranking histórico.");
+				return string.Empty;
+			}
+
+			output.Append(new Tr_ProfileCardTitles(reader, colorClass, playerInfo.Titles).Replace(Tag.Empty, context));
+			output.Append(new Tr_ProfileCardGolds(reader, colorClass, playerInfo.Golds).Replace(Tag.Empty, context));
+			output.Append(new Tr_ProfileCardSilvers(reader, colorClass, playerInfo.Silvers).Replace(Tag.Empty, context));
+			output.Append(new Tr_ProfileCardBronzes(reader, colorClass, playerInfo.Bronzes).Replace(Tag.Empty, context));
 
 			return output.ToString();
 		}
+
+		private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
 
 	}
 

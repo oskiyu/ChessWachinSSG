@@ -22,7 +22,7 @@ namespace ChessWachinSSG.HTML.Tags {
 
 			Dictionary<string, ITagReplacer> replacers = [];
 
-			replacers.AddReplacersRange(Tr_PlayoffsDrawMethods.GetPlayerReplacers(playoffs));
+			replacers.AddReplacersRange(Tr_PlayoffsDrawMethods.GetPlayerReplacers(playoffs.League, playoffs));
 			replacers.AddReplacersRange(Tr_PlayoffsDrawMethods.GetResultReplacers(playoffs));
 			replacers.AddReplacersRange(Tr_PlayoffsDrawMethods.GetOverallResultReplacers(playoffs));
 			replacers.AddReplacersRange(Tr_PlayoffsDrawMethods.GetDurationReplacers(playoffs));

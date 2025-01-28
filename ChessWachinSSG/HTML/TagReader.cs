@@ -63,7 +63,9 @@ namespace ChessWachinSSG.HTML {
 				currentArg.Append(c);
 			}
 
-			return new Tag(args[0], args.Skip(1).ToList(), indices.End - indices.Start, indices.Start);
+			var tag = args.Count > 0 ? args[0] : string.Empty;
+			var remainingArguments = args.Count > 0 ? args.Skip(1).ToList() : [];
+			return new Tag(tag, remainingArguments, indices.End - indices.Start, indices.Start);
 		}
 
 		/// <summary>

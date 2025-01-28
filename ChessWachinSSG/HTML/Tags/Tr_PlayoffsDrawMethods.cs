@@ -26,12 +26,12 @@ namespace ChessWachinSSG.HTML.Tags {
 		/// Replacers para los nombres de los jugadores
 		/// y para sus puntuaciones totales.
 		/// </returns>
-		public static Dictionary<string, ITagReplacer> GetPlayerReplacers(Playoffs playoffs) {
+		public static Dictionary<string, ITagReplacer> GetPlayerReplacers(League league, Playoffs playoffs) {
 			var output = new Dictionary<string, ITagReplacer>();
 
-			output.AddReplacersRange(GetPlayerReplacers(playoffs, PlayoffRoundType.Semifinal1));
-			output.AddReplacersRange(GetPlayerReplacers(playoffs, PlayoffRoundType.Semifinal2));
-			output.AddReplacersRange(GetPlayerReplacers(playoffs, PlayoffRoundType.Final));
+			output.AddReplacersRange(GetPlayerReplacers(league, playoffs, PlayoffRoundType.Semifinal1));
+			output.AddReplacersRange(GetPlayerReplacers(league, playoffs, PlayoffRoundType.Semifinal2));
+			output.AddReplacersRange(GetPlayerReplacers(league, playoffs, PlayoffRoundType.Final));
 
 			return output;
 		}
@@ -43,26 +43,35 @@ namespace ChessWachinSSG.HTML.Tags {
 		/// y para sus puntuaciones totales para la
 		/// fasee indicada.
 		/// </returns>
-		private static Dictionary<string, ITagReplacer> GetPlayerReplacers(Playoffs playoffs, PlayoffRoundType type) {
+		private static Dictionary<string, ITagReplacer> GetPlayerReplacers(League league, Playoffs playoffs, PlayoffRoundType type) {
 			var phase = type switch {
 				PlayoffRoundType.Semifinal1 => playoffs.Semifinals1,
 				PlayoffRoundType.Semifinal2 => playoffs.Semifinals2,
 				PlayoffRoundType.Final => playoffs.Finals
 			};
 
-			if (phase == null || phase.Matches.GetAll().Count == 0) {
+			if (phase == null && !league.IsFinished) {
 				return [];
 			}
 
-			var firstPlayer = phase.Matches.GetAll()[0].First;
-			var secondPlayer = phase.Matches.GetAll()[0].Second;
+			var firstPlayer = type switch {
+				PlayoffRoundType.Semifinal1 => league.Ranking.Ranking[0].Player,
+				PlayoffRoundType.Semifinal2 => league.Ranking.Ranking[1].Player,
+				PlayoffRoundType.Final => playoffs.Semifinals1?.Ranking.Ranking[0].Player
+			};
 
-			var firstPoints = phase.Ranking.GetPlayerInfo(firstPlayer.Id)?.Points.ToString() ?? string.Empty;
-			var secondPoints = phase.Ranking.GetPlayerInfo(secondPlayer.Id)?.Points.ToString() ?? string.Empty;
+			var secondPlayer = type switch {
+				PlayoffRoundType.Semifinal1 => league.Ranking.Ranking[3].Player,
+				PlayoffRoundType.Semifinal2 => league.Ranking.Ranking[2].Player,
+				PlayoffRoundType.Final => playoffs.Semifinals2?.Ranking.Ranking[0].Player
+			};
+
+			var firstPoints = phase?.Ranking.GetPlayerInfo(firstPlayer?.Id ?? string.Empty)?.Points.ToString() ?? string.Empty;
+			var secondPoints = phase?.Ranking.GetPlayerInfo(secondPlayer?.Id ?? string.Empty)?.Points.ToString() ?? string.Empty;
 
 			return new() {
-				{ $"cwssg:playoffs:{GetPlayoffPhaseTypeStr(type)}:first", new Tr_Inline($"<{firstPlayer.NameTag}>") },
-				{ $"cwssg:playoffs:{GetPlayoffPhaseTypeStr(type)}:second", new Tr_Inline($"<{secondPlayer.NameTag}>") },
+				{ $"cwssg:playoffs:{GetPlayoffPhaseTypeStr(type)}:first", new Tr_Inline($"<{firstPlayer?.NameTag ?? "?"}>") },
+				{ $"cwssg:playoffs:{GetPlayoffPhaseTypeStr(type)}:second", new Tr_Inline($"<{secondPlayer?.NameTag ?? "?"}>") },
 				{ $"cwssg:playoffs:{GetPlayoffPhaseTypeStr(type)}:first:points", new Tr_Inline($"{firstPoints}") },
 				{ $"cwssg:playoffs:{GetPlayoffPhaseTypeStr(type)}:second:points", new Tr_Inline($"{secondPoints}") }
 			};

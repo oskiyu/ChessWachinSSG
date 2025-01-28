@@ -28,44 +28,26 @@ namespace ChessWachinSSG.HTML.Tags {
 
 				var template = reader.GetStream("Sources/historical_table_entry.html").ReadToEnd();
 
-				var cups = 0;
-				var golds = 0;
-				var silvers = 0;
-				var bronzes = 0;
-				foreach (var (_, competition) in context.Competitions) {
-					if (competition.LeaguePhase != null && competition.LeaguePhase.IsFinished) {
-						golds += competition.LeaguePhase.IsPlayerFirst(playerScore.Player) ? 1 : 0;
-						silvers += competition.LeaguePhase.IsPlayerSecond(playerScore.Player) ? 1 : 0;
-						bronzes += competition.LeaguePhase.IsPlayerThird(playerScore.Player) ? 1 : 0;
-					}
-
-					if (competition.Playoffs != null) {
-						cups += competition.Playoffs.Winner == playerScore.Player ? 1 : 0;
-						golds += competition.Playoffs.Winner == playerScore.Player ? 1 : 0;
-						silvers += competition.Playoffs.Second == playerScore.Player ? 1 : 0;
-					}
-				}
-
 				var titlesBuilder = new StringBuilder();
-				if (cups > 0) {
+				if (playerData.Titles > 0) {
 					titlesBuilder.Append(Globals.Cup);
-					titlesBuilder.Append($" x{cups}");
+					titlesBuilder.Append($" x{playerData.Titles}");
 				}
 
 				var medalsBuilder = new StringBuilder();
-				if (golds > 0) {
+				if (playerData.Golds > 0) {
 					medalsBuilder.Append(Globals.GoldMedal);
-					medalsBuilder.Append($" x{golds} ");
+					medalsBuilder.Append($" x{playerData.Golds} ");
 				}
 
-				if (silvers > 0) {
+				if (playerData.Silvers > 0) {
 					medalsBuilder.Append(Globals.SilverMedal);
-					medalsBuilder.Append($" x{silvers} ");
+					medalsBuilder.Append($" x{playerData.Silvers} ");
 				}
 
-				if (bronzes > 0) {
+				if (playerData.Bronzes > 0) {
 					medalsBuilder.Append(Globals.BronzeMedal);
-					medalsBuilder.Append($" x{bronzes}");
+					medalsBuilder.Append($" x{playerData.Bronzes}");
 				}
 
 				var replacers = new Dictionary<string, ITagReplacer> {

@@ -13,7 +13,8 @@
 	/// <param name="sf2">Segunda semifinal (opcional).</param>
 	/// <param name="final">Final (opcional) (si está, entonces ambas semifinales deben estar estrablecidas).</param>
 	/// <param name="defaultDurations">Duraciones por defecto de las partidas.</param>
-	public record class Playoffs(string Id, PlayoffsRound? Semifinals1, PlayoffsRound? Semifinals2, PlayoffsRound? Finals, IReadOnlyList<string> DefaultDurations) {
+	/// <param name="League">Liga previa a los playoffs.</param>
+	public record class Playoffs(string Id, PlayoffsRound? Semifinals1, PlayoffsRound? Semifinals2, PlayoffsRound? Finals, IReadOnlyList<string> DefaultDurations, League League) {
 
 		/// <summary>
 		/// Ganador, si está terminado. 
