@@ -133,13 +133,14 @@ namespace ChessWachinSSG.Data.Daos {
                     string? leagueName = DaoMethods.GetJsonString("name", phase, logger);
                     string? leagueMatchesPath = DaoMethods.GetJsonString("matches", phase, logger);
                     int? numQualifications = DaoMethods.GetJsonInt("num_advances", phase, logger);
+					string? desempateMatchesPath = DaoMethods.GetJsonString("matches_desempate", phase, logger);
 
-                    if (leagueId == null || leagueName == null || leagueMatchesPath == null || numQualifications == null) {
+					if (leagueId == null || leagueName == null || leagueMatchesPath == null || numQualifications == null) {
                         logger.Error("Fase de liga sin argumentos correctos.");
                         continue;
                     }
 
-                    return new(leagueId, leagueName, leagueMatchesPath, numQualifications.Value);
+                    return new(leagueId, leagueName, leagueMatchesPath, numQualifications.Value, desempateMatchesPath);
                 }
 
             return null;

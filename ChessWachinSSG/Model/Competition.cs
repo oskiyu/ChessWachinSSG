@@ -16,6 +16,7 @@
 
 			var matchesBuilder = new MatchList.Builder();
 			matchesBuilder.AddAllMatches(league?.Matches ?? new());
+			matchesBuilder.AddAllMatches(league?.DesempateMatches ?? new());
 			matchesBuilder.AddAllMatches(playoffs?.Semifinals1?.Matches ?? new());
 			matchesBuilder.AddAllMatches(playoffs?.Semifinals2?.Matches ?? new());
 			matchesBuilder.AddAllMatches(playoffs?.Finals?.Matches ?? new());

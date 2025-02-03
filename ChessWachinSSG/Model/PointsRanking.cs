@@ -18,7 +18,7 @@ namespace ChessWachinSSG.Model {
 			/// Ranking correctamente ordenado.
 			/// </returns>
 			public PointsRanking Build() {
-				instance.Sort();
+				instance.Sort(league);
 				return instance;
 			}
 
@@ -77,6 +77,15 @@ namespace ChessWachinSSG.Model {
 				return this;
 			}
 
+			/// <summary>
+			/// Tiene en cuenta las partidas de desempate.
+			/// </summary>
+			public Builder WithLeague(League league) {
+				this.league = league;
+				return this;
+			}
+
+			private League? league = null;
 			private readonly PointsRanking instance = new();
 
 		}
@@ -85,9 +94,25 @@ namespace ChessWachinSSG.Model {
 		/// Ordena los jugadores según
 		/// la puntuación.
 		/// </summary>
-		private void Sort() {
+		private void Sort(League? league) {
 			orderedRanking = [.. scores.Values];
-			orderedRanking.Sort();
+			orderedRanking.Sort(
+				(first, second) => {
+					if (league == null) {
+						return first.CompareTo(second);
+					}
+					if (first.Points == second.Points) {
+						return league.DesempateWinner(first.Player, second.Player) switch {
+							Winner.First => -1,
+							Winner.Second => 1,
+							_ => 0
+						};
+					}
+					else {
+						return first.CompareTo(second);
+					}
+				}
+				);
 		}
 
 		

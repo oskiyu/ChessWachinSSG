@@ -24,6 +24,7 @@ namespace ChessWachinSSG.Model {
 				var allMatchesBuilder = new MatchList.Builder();
 
 				allMatchesBuilder.AddAllMatches(competition.LeaguePhase?.Matches ?? new());
+				allMatchesBuilder.AddAllMatches(competition.LeaguePhase?.DesempateMatches ?? new());
 
 				allMatchesBuilder.AddAllMatches(competition.Playoffs?.Semifinals1?.Matches	?? new());
 				allMatchesBuilder.AddAllMatches(competition.Playoffs?.Semifinals2?.Matches	?? new());

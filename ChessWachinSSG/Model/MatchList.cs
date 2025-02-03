@@ -45,6 +45,8 @@ namespace ChessWachinSSG.Model {
 
 			private readonly MatchList instance = new();
 
+			public bool IsEmpty { get => instance.matches.Count == 0; }
+
 		}
 		
 		/// <returns>Todas las partidas.</returns>

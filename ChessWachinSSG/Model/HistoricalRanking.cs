@@ -68,6 +68,7 @@ namespace ChessWachinSSG.Model {
 
 				// Aplicamos las partidas.
 				ApplyAllMatches(competition.LeaguePhase?.Matches ?? new MatchList());
+				ApplyAllMatches(competition.LeaguePhase?.DesempateMatches ?? new MatchList());
 				ApplyAllMatches(competition.Playoffs?.Semifinals1?.Matches ?? new MatchList());
 				ApplyAllMatches(competition.Playoffs?.Semifinals2?.Matches ?? new MatchList());
 				ApplyAllMatches(competition.Playoffs?.Finals?.Matches ?? new MatchList());

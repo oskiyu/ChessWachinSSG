@@ -48,6 +48,7 @@ namespace ChessWachinSSG.Model {
 
 					// Carga de las partidas de la fase de liga.
 					var leagueMatchesBuilder = new MatchList.Builder();
+					var desempateMatchesBuilder = new MatchList.Builder();
 					if (c.League != null) {
 						foreach (var m in MatchDao.FromFile(c.League!.MatchesPath, new FileReader()).GetAllMatches()) {
 							leagueMatchesBuilder.AddMatch(
@@ -60,6 +61,21 @@ namespace ChessWachinSSG.Model {
 									m.DurationType,
 									m.Url,
 									m.Date));
+						}
+
+						if (c.League!.DesempateMatchesPath != null) {
+							foreach (var m in MatchDao.FromFile(c.League!.DesempateMatchesPath, new FileReader()).GetAllMatches()) {
+								desempateMatchesBuilder.AddMatch(
+									new(
+										instance.Players[m.FirstPlayerId],
+										instance.Players[m.SecondPlayerId],
+										m.Winner,
+										m.Moves,
+										m.Duration,
+										m.DurationType,
+										m.Url,
+										m.Date));
+							}
 						}
 					}
 
@@ -117,7 +133,7 @@ namespace ChessWachinSSG.Model {
 					var leagueMatches = leagueMatchesBuilder.Build();
 					League? league = leagueMatches.GetAll().Count switch {
 						0 => null,
-						_ => new League(c.League!.Id, leagueMatches, c.League.QPositions, c.Id)
+						_ => new League(c.League!.Id, leagueMatches, c.League.QPositions, c.Id, desempateMatchesBuilder.IsEmpty ? null : desempateMatchesBuilder.Build())
 					};
 
 					var sf1Matches = sf1MatchesBuilder.Build();
@@ -172,6 +188,7 @@ namespace ChessWachinSSG.Model {
 				instance._tagReplacers[Tr_HistoricalRankingEntry.Id] = new Tr_HistoricalRankingEntry(new FileReader());
 				instance._tagReplacers["cwssg:version"] = new Tr_Inline(Assembly.GetExecutingAssembly().GetName().Version!.ToString());
 				instance._tagReplacers["cwssg:league:history"] = new Tr_MatchHistory(new FileReader());
+				instance._tagReplacers["cwssg:league:desempate:history"] = new Tr_DesempateMatchHistory(new FileReader());
 				instance._tagReplacers["cwssg:league:ranking"] = new Tr_LeagueRanking(new FileReader());
 				instance._tagReplacers["cwssg:partidasporjugar"] = new Tr_PorJugar(new FileReader());
 				instance._tagReplacers["cwssg:playoffs:phase:history"] = new Tr_PlayoffPhaseHistory(new FileReader());
@@ -241,6 +258,7 @@ namespace ChessWachinSSG.Model {
 			foreach (Competition c in Competitions.Values) {
 				if (c.LeaguePhase != null) {
 					builder.AddAllMatches(c.LeaguePhase.Matches);
+					builder.AddAllMatches(c.LeaguePhase.DesempateMatches ?? new());
 				}
 
 				builder.AddAllMatches(c.Playoffs?.Semifinals1?.Matches ?? new());
@@ -301,6 +319,25 @@ namespace ChessWachinSSG.Model {
 						}
 						else {
 							builder.AddLoss();
+						}
+					}
+
+					if (c.LeaguePhase.DesempateMatches != null) {
+						foreach (var m in c.LeaguePhase.DesempateMatches.GetAll().Where(x => x.First == player || x.Second == player)) {
+							if (m.Result == Winner.Draw) {
+								builder.AddDraw();
+								points++;
+								continue;
+							}
+
+							if ((m.First == player && m.Result == Winner.First) || (m.Second == player && m.Result == Winner.Second)) {
+								builder.AddWin();
+								wins++;
+								points += 2;
+							}
+							else {
+								builder.AddLoss();
+							}
 						}
 					}
 

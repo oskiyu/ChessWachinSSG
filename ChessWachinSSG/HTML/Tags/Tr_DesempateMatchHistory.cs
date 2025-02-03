@@ -6,10 +6,10 @@ using System.Text;
 namespace ChessWachinSSG.HTML.Tags {
 
 	/// <summary>
-	/// Reemplaza el tag por un historial de partidas.
+	/// Reemplaza el tag por un historial de partidas de desempate.
 	/// </summary>
 	/// <param name="reader">Clase lectora.</param>
-	public class Tr_MatchHistory(IFileReader reader) : ITagReplacer {
+	public class Tr_DesempateMatchHistory(IFileReader reader) : ITagReplacer {
 
 		public string Replace(Tag tag, Context context) {
 			var leagueId = tag.Arguments[0]!;
@@ -20,19 +20,27 @@ namespace ChessWachinSSG.HTML.Tags {
 				return string.Empty;
 			}
 
-			var htmlTable = reader.GetStream("Sources/league_history_table.html").ReadToEnd();
+			if (league.DesempateMatches == null) {
+				return string.Empty;
+			}
+
+			var htmlTable = reader.GetStream("Sources/league_desempate_history_table.html").ReadToEnd();
 
 			Dictionary<string, ITagReplacer> replacers = new() {
-				{ "cwssg:league:history:entries", new Tr_Inline(GetLeagueMatches(league, context)) },
+				{ "cwssg:league:history:desempate:entries", new Tr_Inline(GetDesempateMatches(league, context)) }
 			};
 
 			return HtmlBuilder.Process(htmlTable, context, replacers);
 		}
 
-		string GetLeagueMatches(League league, Context context) {
+		string GetDesempateMatches(League league, Context context) {
+			if (league.DesempateMatches == null) {
+				return string.Empty;
+			}
+
 			var output = new StringBuilder();
 
-			foreach (var match in GetMatchesByDate(league.Matches)) {
+			foreach (var match in GetMatchesByDate(league.DesempateMatches)) {
 				output.Append(match.Replace(Tag.Empty, context));
 			}
 
