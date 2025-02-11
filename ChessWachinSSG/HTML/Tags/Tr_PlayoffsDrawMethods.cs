@@ -80,15 +80,20 @@ namespace ChessWachinSSG.HTML.Tags {
 
 		/// <param name="type">Fase.</param>
 		/// <param name="match">Partida. Puede ser null si aún no se ha jugado.</param>
+		/// <param name="first">Primer jugador de la ronda.</param>
 		/// <param name="index">Índice de la partida.</param>
 		/// <returns>Replacers para el resultado de la partida.</returns>
-		private static Dictionary<string, ITagReplacer> GetSingleResultReplacers(PlayoffRoundType type, Match? match, int index) {
+		private static Dictionary<string, ITagReplacer> GetSingleResultReplacers(PlayoffRoundType type, Match? match, Player first, int index) {
+			if (match == null) {
+				return [];
+			}
+
 			var firstResult = GetResultClass1(match).ToString();
 			var secondResult = GetResultClass2(match).ToString();
 
 			return new() {
-				{ $"cwssg:playoffs:{GetPlayoffPhaseTypeStr(type)}:result:first:{index}", new Tr_Inline(index % 2 == 0 ? firstResult : secondResult) },
-				{ $"cwssg:playoffs:{GetPlayoffPhaseTypeStr(type)}:result:second:{index}", new Tr_Inline(index % 2 == 1 ? firstResult : secondResult) }
+				{ $"cwssg:playoffs:{GetPlayoffPhaseTypeStr(type)}:result:first:{index}", new Tr_Inline(first == match.First ? firstResult : secondResult) },
+				{ $"cwssg:playoffs:{GetPlayoffPhaseTypeStr(type)}:result:second:{index}", new Tr_Inline(first != match.First ? firstResult : secondResult) }
 			};
 		}
 
@@ -98,17 +103,22 @@ namespace ChessWachinSSG.HTML.Tags {
 		public static Dictionary<string, ITagReplacer> GetResultReplacers(Playoffs playoffs) {
 			var output = new Dictionary<string, ITagReplacer>();
 
-			output.AddReplacersRange(GetResultReplacers(playoffs, PlayoffRoundType.Semifinal1));
-			output.AddReplacersRange(GetResultReplacers(playoffs, PlayoffRoundType.Semifinal2));
-			output.AddReplacersRange(GetResultReplacers(playoffs, PlayoffRoundType.Final));
+			output.AddReplacersRange(GetResultReplacers(playoffs, PlayoffRoundType.Semifinal1, playoffs.League.Ranking.Ranking[0].Player));
+			output.AddReplacersRange(GetResultReplacers(playoffs, PlayoffRoundType.Semifinal2, playoffs.League.Ranking.Ranking[1].Player));
+			output.AddReplacersRange(GetResultReplacers(playoffs, PlayoffRoundType.Final, playoffs.Semifinals1?.Winner));
 
 			return output;
 		}
 
 		/// <param name="playoffs">Playoffs.</param>
 		/// <param name="type">Fase.</param>
+		/// <param name="first">Primer jugador de la ronda.</param>
 		/// <returns>Replacers para todos los resultados de las partidas de la fase indicada.</returns>
-		private static Dictionary<string, ITagReplacer> GetResultReplacers(Playoffs playoffs, PlayoffRoundType type) {
+		private static Dictionary<string, ITagReplacer> GetResultReplacers(Playoffs playoffs, PlayoffRoundType type, Player? first) {
+			if (first == null) {
+				return [];
+			}
+
 			var output = new Dictionary<string, ITagReplacer>();
 
 			var phase = type switch {
@@ -118,7 +128,7 @@ namespace ChessWachinSSG.HTML.Tags {
 			};
 
 			for (int i = 0; i < playoffs.DefaultDurations.Count; i++) {
-				output.AddReplacersRange(GetSingleResultReplacers(type, phase?.Matches.GetAt(i), i));
+				output.AddReplacersRange(GetSingleResultReplacers(type, phase?.Matches.GetAt(i), first, i));
 			}
 
 			return output;
@@ -171,34 +181,44 @@ namespace ChessWachinSSG.HTML.Tags {
 		/// <returns>Replacers para las clases de los resultados de cada fase.</returns>
 		public static Dictionary<string, ITagReplacer> GetOverallResultReplacers(Playoffs playoffs) {
 			var output = new Dictionary<string, ITagReplacer>();
+			
+			var league = playoffs.League;
 
-			output.AddReplacersRange(GetOverallResultReplacers(playoffs, PlayoffRoundType.Semifinal1));
-			output.AddReplacersRange(GetOverallResultReplacers(playoffs, PlayoffRoundType.Semifinal2));
-			output.AddReplacersRange(GetOverallResultReplacers(playoffs, PlayoffRoundType.Final));
+			var firstSemi_firstPlayer = league.Ranking.Ranking[0].Player;
+			var firstSemi_secondPlayer = league.Ranking.Ranking[3].Player;
+
+			var secondSemi_firstPlayer = league.Ranking.Ranking[1].Player;
+			var secondSemi_secondPlayer = league.Ranking.Ranking[2].Player;
+
+			Player? finals_firstPlayer = playoffs.Semifinals1?.Winner;
+			Player? finals_secondPlayer = playoffs.Semifinals2?.Winner;
+
+			output.AddReplacersRange(GetOverallResultReplacers(playoffs, PlayoffRoundType.Semifinal1, firstSemi_firstPlayer, firstSemi_secondPlayer));
+			output.AddReplacersRange(GetOverallResultReplacers(playoffs, PlayoffRoundType.Semifinal2, secondSemi_firstPlayer, secondSemi_secondPlayer));
+			output.AddReplacersRange(GetOverallResultReplacers(playoffs, PlayoffRoundType.Final, finals_firstPlayer, finals_secondPlayer));
 
 			return output;
 		}
 
 		/// <param name="playoffs">Playoffs.</param>
 		/// <param name="type">Fase.</param>
+		/// <param name="first">Primer jugador de la ronda.</param>
+		/// <param name="second">Segundo jugador de la ronda.</param>
 		/// <returns>Replacers para las clases de los resultados de la fase indicada.</returns>
-		private static Dictionary<string, ITagReplacer> GetOverallResultReplacers(Playoffs playoffs, PlayoffRoundType type) {
+		private static Dictionary<string, ITagReplacer> GetOverallResultReplacers(Playoffs playoffs, PlayoffRoundType type, Player? first, Player? second) {
 			var phase = type switch {
 				PlayoffRoundType.Semifinal1 => playoffs.Semifinals1,
 				PlayoffRoundType.Semifinal2 => playoffs.Semifinals2,
 				PlayoffRoundType.Final => playoffs.Finals
 			};
 
-			if (phase == null || phase.Matches.GetAll().Count == 0) {
+			if (phase == null || phase.Matches.GetAll().Count == 0 || first == null || second == null) {
 				return [];
 			}
 
-			var firstPlayer = phase.Matches.GetAll()[0].First;
-			var secondPlayer = phase.Matches.GetAll()[0].Second;
-
 			return new() {
-				{ $"cwssg:playoffs:{GetPlayoffPhaseTypeStr(type)}:result:first", new Tr_Inline(GetPhaseResultClass(phase.Ranking.GetPlayerPosition(firstPlayer))) },
-				{ $"cwssg:playoffs:{GetPlayoffPhaseTypeStr(type)}:result:second", new Tr_Inline(GetPhaseResultClass(phase.Ranking.GetPlayerPosition(secondPlayer))) },
+				{ $"cwssg:playoffs:{GetPlayoffPhaseTypeStr(type)}:result:first", new Tr_Inline(GetPhaseResultClass(phase.Ranking.GetPlayerPosition(first))) },
+				{ $"cwssg:playoffs:{GetPlayoffPhaseTypeStr(type)}:result:second", new Tr_Inline(GetPhaseResultClass(phase.Ranking.GetPlayerPosition(second))) },
 			};
 		}
 
